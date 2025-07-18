@@ -8,3 +8,4 @@ typing
 chromadb
 langchain_chroma
 pypdf
+prettier  # For code formatting
