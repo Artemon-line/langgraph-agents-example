@@ -26,7 +26,7 @@ def test_save_conversation(mock_file):
         HumanMessage(content="hello"),
         AIMessage(content="hi there"),
     ]
-    save_conversation(conversation, "test_log.txt")
+    save_conversation(conversation, "log.txt")
 
     # Check if file was written correctly
     mock_file().write.assert_any_call("Conversation history:\n")

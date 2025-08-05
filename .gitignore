@@ -30,3 +30,6 @@ Thumbs.db
 *.log
 log.txt
 
+# Test Report
+test-reports
+
