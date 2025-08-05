@@ -1,11 +1,13 @@
-langgraph
-langchain
-ipython
-langchain_ollama
-langchain_community
-dotenv
-typing
-chromadb
-langchain_chroma
-pypdf
-prettier  # For code formatting
+langgraph==0.6.3
+langchain==0.3.27
+ipython==9.4.0
+langchain_ollama==0.3.6
+langchain_community==0.3.27
+dotenv==0.9.9
+typing==3.7.4.3
+chromadb==1.0.15
+langchain_chroma==0.2.5
+pypdf==5.9.0
+prettier==0.0.7
+pytest==8.4.1
+pytest-html==4.1.1

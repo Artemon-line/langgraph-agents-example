@@ -6,6 +6,8 @@ from langchain_core.tools import tool
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 
+from Agents.utils import print_stream
+
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
@@ -67,16 +69,6 @@ graph.add_conditional_edges(
 graph.add_edge("tools", "our_agent")  ## Back to the agent
 
 app = graph.compile()
-
-
-def print_stream(stream):
-    for s in stream:
-        m = s["messages"][-1]
-        if isinstance(m, tuple):
-            print(m)
-        else:
-            m.pretty_print()
-
 
 inputs = {
     "messages": [

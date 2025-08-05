@@ -20,28 +20,41 @@ def process(state: AgentState) -> AgentState:
     return state
 
 
-graph = StateGraph(AgentState)
-graph.add_node("process", process)
-graph.add_edge(START, "process")
-graph.add_edge("process", END)
-agent = graph.compile()
+def save_conversation(
+    conversation_history: List[Union[HumanMessage, AIMessage]],
+    filename: str = "log.txt",
+):
+    """Save conversation history to a file"""
+    with open(filename, "w") as file:
+        file.write("Conversation history:\n")
+        for m in conversation_history:
+            if isinstance(m, HumanMessage):
+                file.write(f"User: {m.content}\n")
+            elif isinstance(m, AIMessage):
+                file.write(f"AI: {m.content}\n\n")
+        file.write("End of Conversation")
 
-user_input = input("Say something: ")
 
-conversation_history = []
+def chat_loop():
+    """Main chat loop"""
+    graph = StateGraph(AgentState)
+    graph.add_node("process", process)
+    graph.add_edge(START, "process")
+    graph.add_edge("process", END)
+    agent = graph.compile()
 
-while user_input != "exit":
-    conversation_history.append(HumanMessage(content=user_input))
-    result = agent.invoke({"messages": conversation_history})
-    conversation_history = result["messages"]
-    user_input = input("User: ")
+    conversation_history = []
+    user_input = input("Say something: ")
 
-with open("log.txt", "w") as file:
-    file.write("Conversation history:\n")
+    while user_input != "exit":
+        conversation_history.append(HumanMessage(content=user_input))
+        result = agent.invoke({"messages": conversation_history})
+        conversation_history = result["messages"]
+        user_input = input("User: ")
 
-    for m in conversation_history:
-        if isinstance(m, HumanMessage):
-            file.write(f"User: {m.content}\n")
-        elif isinstance(m, AIMessage):
-            file.write(f"AI: {m.content}\n\n")
-    file.write("End of Conversation")
+    save_conversation(conversation_history)
+    return conversation_history
+
+
+if __name__ == "__main__":
+    chat_loop()

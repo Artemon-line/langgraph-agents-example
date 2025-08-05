@@ -1,0 +1,62 @@
+name: ollama-e2e
+
+on: [push]
+
+jobs:
+  ollama-e2e:
+    name: ollama-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12.4
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12.4
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - uses: actions/checkout@v1
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sudo -E sh
+      - name: Start serving
+        run: |
+          # Run the background, there is no way to daemonise at the moment
+          ollama serve &
+
+          # A short pause is required before the HTTP port is opened
+          sleep 5
+
+          # This endpoint blocks until ready
+          time curl -i http://localhost:11434
+
+      - name: Pull llama3.2
+        run: |
+          ollama pull llama3.2
+
+      - name: Run Unit Tests with Report
+        run: |
+          pytest tests/unit -v --no-cov --html=test-reports/unit-report.html --self-contained-html
+
+      - name: Run Integration Tests with Report
+        run: |
+          pytest tests/integration -v --no-cov --html=test-reports/integration-report.html --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload test reports
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: test-reports
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
+        with:
+          artifact_name: github-pages
