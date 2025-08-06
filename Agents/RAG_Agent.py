@@ -20,7 +20,9 @@ llm = ChatOllama(model="llama3.2:latest", temperature=0)  # Minimize hallucinati
 
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
-pdf_path = "Stock_Market_Performance_2024.pdf"
+pdf_path = os.path.join(
+    os.path.dirname(os.getcwd()), "static", "Stock_Market_Performance_2024.pdf"
+)
 
 if not os.path.exists(pdf_path):
     raise FileNotFoundError(f"PDF file not found: {pdf_path}")
@@ -41,7 +43,8 @@ text_splitter = RecursiveCharacterTextSplitter(
 
 pages_split = text_splitter.split_documents(pages)
 
-persist_directory = r"Agents/Chroma"
+persist_directory = os.path.join(os.path.dirname(os.getcwd()), "Agents", "Chroma")
+print("persist_directory", persist_directory)
 collection_name = "stock_market"
 
 if not os.path.exists(persist_directory):
