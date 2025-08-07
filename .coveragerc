@@ -1,0 +1,25 @@
+[run]
+branch = True
+source = Agents
+parallel = true
+relative_files = true
+data_file = .coverage.nb
+omit = 
+    */*ipykernel*/*
+    tests/*
+
+[paths]
+source =
+    Agents/
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    pass
+    raise ImportError
+    
+sigterm = true

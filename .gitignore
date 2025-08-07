@@ -33,4 +33,10 @@ log.txt
 # Test Report
 test-reports
 
+# Conversation logs
 Notebooks/test_conversation.txt
+test_conversation.txt
+
+# Coverage
+.coverage
+.coverage.nb
