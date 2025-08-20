@@ -60,6 +60,12 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
 
+      - name: Run Notebooks Tests
+        run: |
+          pytest tests/nb_tests -v --ctrf test-reports/ctrf/nb-tests.report.json
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
@@ -73,3 +79,10 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages
+
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './test-reports/*.json'
+          github-report: true
+        if: always()

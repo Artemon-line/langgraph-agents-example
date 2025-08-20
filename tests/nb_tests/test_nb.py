@@ -1,56 +1,54 @@
 import pytest
 from pathlib import Path
-import os
 import logging
 import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
-import coverage
-from coverage.files import PathAliases
+from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
+from typing import List
 
 logger = logging.getLogger(__name__)
 
 NOTEBOOK_DIR = Path("./Notebooks")
-SKIP_NOTEBOOKS = ["RAG_Agent.ipynb"]
+SEARCH = "**/*.ipynb"
 TIMEOUT = 600
+SKIP_NOTEBOOKS = ["RAG_Agent.ipynb"]
 
 
-def setup_coverage():
-    """Setup coverage with proper configuration"""
-    aliases = PathAliases()
-    aliases.add(pattern="*/Agents/", result="Agents")
-
-    return coverage.Coverage(
-        source=["Agents"],
-        branch=True,
-        data_file=".coverage.nb",
-        config_file=True,
-        source_pkgs=["Agents"],
-        include=["*/Agents/*"],
-    )
+def get_notebooks() -> List[Path]:
+    """Get all notebooks to test"""
+    return [
+        f
+        for f in NOTEBOOK_DIR.glob(SEARCH)
+        if f.name not in SKIP_NOTEBOOKS
+        and ".ipynb_checkpoints" not in str(f.absolute())
+    ]
 
 
-@pytest.mark.parametrize(
-    "notebook",
-    [f for f in NOTEBOOK_DIR.glob("**/*.ipynb") if f.name not in SKIP_NOTEBOOKS],
-)
-def test_notebook_execution(notebook: Path, covr: bool = True):
-    cov = None
-    try:
-        cov = setup_coverage() if covr else None
-        if cov:
-            cov.start()
+def run_notebook(notebook: Path) -> None:
+    """Execute and validate notebook"""
+    logger.info(f"Testing notebook: {notebook.name}")
 
-        with open(notebook) as f:
-            nb = nbformat.read(f, as_version=4)
+    with notebook.open() as f:
+        nb = nbformat.read(f, as_version=4)
 
-        logger.debug("Executing notebook: %s", notebook)
+    code_cells = len([c for c in nb.cells if c.cell_type == "code"])
+    logger.info(f"- Total code cells: {code_cells}")
 
-        ep = ExecutePreprocessor(timeout=TIMEOUT)
-        ep.preprocess(nb)
+    ep = ExecutePreprocessor(timeout=TIMEOUT)
+    ep.preprocess(nb, {"metadata": {"path": str(notebook.parent)}})
 
-        # Stop and save coverage data
-    finally:
-        # Ensure coverage is stopped and saved
-        if cov:
-            cov.stop()
-            cov.save()
+    assert code_cells > 0, f"No code cells found in {notebook.name}"
+    logger.info(f"✓ {notebook.name} executed successfully")
+
+
+# Dynamically create test functions for each notebook
+for notebook in get_notebooks():
+
+    def make_test(nb: Path):
+        def test_func():
+            run_notebook(nb)
+
+        return test_func
+
+    test_name = f"test_{notebook.stem.lower()}"
+    # Add test to module namespace
+    globals()[test_name] = make_test(notebook)

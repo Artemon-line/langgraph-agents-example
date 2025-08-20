@@ -13,6 +13,7 @@ prettier==0.0.7
 pypdf==5.9.0
 pytest-cov==6.2.1
 pytest-html==4.1.1
+pytest-json-ctrf=0.3.5
 pytest-xdist==3.8.0
 pytest==8.4.1
 typing==3.7.4.3
