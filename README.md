@@ -11,4 +11,20 @@ ollama pull llama3.2:latest
 ollama pull nomic-embed-text
 ```
 
+🧪 **Notebook Testing:**  
+This repository also demonstrates how to use Jupyter notebooks as test cases, following the approach from [Jupyter Notebook Testing](https://blog.iqmo.com/blog/python/jupyter_notebook_testing/). 
+Test results are formatted using pytest-json-crtf for better readability and CI/CD integration.
+
+Key features:
+- Automated notebook execution validation
+- Dynamic test generation for notebooks
+- Detailed test reporting with JSON output
+- GitHub Actions integration
+- Coverage reporting for notebook code
+
+To run notebook tests:
+```sh
+pytest tests/nb_tests/test_nb.py --ctrf test-reports/ctrf/nb-tests.report.json
+```
+
 💡 Explore how to build complex AI agents with Python, LangGraph, and LangChain!
