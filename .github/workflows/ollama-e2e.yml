@@ -87,4 +87,12 @@ jobs:
         with:
           report-path: "./test-reports/ctrf/*.json"
           test-report: true
+          summary-report: true
+          failed-report: true
+          flaky-report: true
+          insights-report: true
+          # Order reports with the most important information first
+          report-order: "summary-report,failed-report,flaky-report,insights-report,test-report"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: always()
